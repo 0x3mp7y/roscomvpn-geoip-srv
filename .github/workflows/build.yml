@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CURL: "curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused"
+      RELEASE_DAT_NAME: geoip_rsc.dat
       GIT_AUTHOR_NAME: ${{ vars.RELEASE_GIT_NAME || github.repository_owner }}
       GIT_AUTHOR_EMAIL: ${{ vars.RELEASE_GIT_EMAIL || format('{0}@users.noreply.github.com', github.repository_owner) }}
       COUNTRYDB_REPOSITORY: ${{ vars.COUNTRYDB_REPOSITORY || 'hydraponique/countrydb' }}
@@ -127,6 +128,7 @@ jobs:
           rm -rf release
           mkdir -p release/text release/mihomo release/sing-box
           cp geoip/output/dat/*.dat release/
+          mv release/geoip.dat "release/${{ env.RELEASE_DAT_NAME }}"
           cp -f geoip/output/text/*.txt release/text/
           cp -f geoip/output/mrs/*.mrs   release/mihomo/
           cp -f geoip/output/srs/*.srs   release/sing-box/
@@ -137,7 +139,7 @@ jobs:
           test -s /tmp/text.tar.gz
           test -s /tmp/mihomo.tar.gz
           test -s /tmp/sing-box.tar.gz
-          sha256sum release/geoip.dat > release/geoip.dat.sha256
+          sha256sum "release/${{ env.RELEASE_DAT_NAME }}" > "release/${{ env.RELEASE_DAT_NAME }}.sha256"
 
       - name: MASTER Push to release branch and update master
         if: github.ref_name == 'master'
@@ -194,10 +196,11 @@ jobs:
           rm -rf release
           mkdir -p release/text release/mihomo release/sing-box
           cp geoip/output/dat/*.dat release/
+          mv release/geoip.dat "release/${{ env.RELEASE_DAT_NAME }}"
           cp -f geoip/output/text/*.txt release/text/
           cp -f geoip/output/mrs/*.mrs   release/mihomo/
           cp -f geoip/output/srs/*.srs   release/sing-box/
-          sha256sum release/geoip.dat > release/geoip.dat.sha256
+          sha256sum "release/${{ env.RELEASE_DAT_NAME }}" > "release/${{ env.RELEASE_DAT_NAME }}.sha256"
 
       - name: TEST Push to test-release branch & update test branch
         if: github.ref_name == 'test'
